@@ -1,12 +1,53 @@
-# React + Vite
+# 🧾 Spring Bottom Sheet (React)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> ⚙️ \*README generated with the help of AI to save time and focus on core development.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✅ Features Implemented
 
-## Expanding the ESLint configuration
+- 📱 **Bottom sheet UI** with snap points: `90%`, `50%`, and `10%` of viewport height.
+- 🧩 Spring **transition animation** using css tanslate.
+- 👤 **User Profile View** with(these are dummy and uses random API):
+  - Name, occupation, and avatar
+  - About section
+  - Hobbies (with emojis)
+  - Favorite photos using `https://picsum.photos` API
+- 📐 Fully **responsive** layout using Tailwind CSS
+- 🧠 **No external motion libraries** (custom snap logic)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 📸 Screens (Preview)
+
+> ⚠️ Preview not added here, please see the deployed link.
+
+---
+
+## 📦 Project Structure
+
+- `SpringSheet.jsx` – Single file containing all logic for now
+  - UI rendering
+  - Snap calculation
+  - Tab switching
+  - Content display
+
+---
+
+## 🧪 Things Left To Do
+
+- ❗ **Fix Snap to 10%**: Currently the bottom sheet goes beyond the screen (off view) when snapping to `10%`. Needs fix, a very weird bug.
+- 🧠 **Add Drag/Swipe Gesture**: Currently only snapping via button click. Next: Add touch/mouse drag interaction.
+- 🧼 **Refactor into components**:
+  - `ProfileHeader.jsx`
+  - `Tabs.jsx`
+  - `TabContent.jsx`
+
+---
+
+## 🚀 How to Run
+
+```bash
+npm install
+npm start
+```
