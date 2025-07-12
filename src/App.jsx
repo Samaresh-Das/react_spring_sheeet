@@ -1,14 +1,11 @@
-import { useState } from "react";
-
 import "./App.css";
+import SpringSheet from "./components/SpringSheet";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
       <div>
-        <p>Hello</p>
+        <SpringSheet />
       </div>
     </>
   );
