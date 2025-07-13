@@ -36,7 +36,6 @@
 
 ## 🧪 Things Left To Do
 
-- 🧠 **Add Drag/Swipe Gesture**: A bug is there in the drag that needs fixing
 - 🧼 **Refactor into components**
 
 ---
