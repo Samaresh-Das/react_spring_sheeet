@@ -5,18 +5,25 @@ const SpringSheet = () => {
   const containerRef = useRef(null);
   const [currentArea, setCurrentArea] = useState(0);
   const [activeTab, setActiveTab] = useState("about");
+  const [viewHeight, setViewHeight] = useState(0);
 
   const snapAreas = [90, 50, 10];
 
-  const [viewHeight, setViewHeight] = useState(0);
+  const startingPositon = useRef(0);
+  const top = useRef(0);
+
+  const maxSheetHeight = 90;
 
   const getVertical = (index) => {
-    return viewHeight - (viewHeight * snapAreas[index]) / 100;
+    const inView = (maxSheetHeight * snapAreas[index]) / 100;
+    const hiddenArea = maxSheetHeight - inView;
+    return (viewHeight * hiddenArea) / 100;
   };
 
   const getSnappedToSnapArea = (index) => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || viewHeight === 0) return;
     const y = getVertical(index);
+    containerRef.current.style.transform = `transform 0.3s ease-out`;
     containerRef.current.style.transform = `translateY(${y}px)`;
     setCurrentArea(index);
   };
@@ -38,6 +45,16 @@ const SpringSheet = () => {
     }
   }, [viewHeight]);
 
+  const buttonColors = (point) => {
+    if (point === 90) {
+      return "bg-lime-500 hover:bg-lime-600";
+    } else if (point === 50) {
+      return "bg-yellow-500 hover:bg-yellow-600";
+    } else {
+      return "bg-red-500 hover:bg-red-700";
+    }
+  };
+
   return (
     <div
       ref={containerRef}
@@ -54,7 +71,9 @@ const SpringSheet = () => {
           <button
             key={i}
             onClick={() => getSnappedToSnapArea(i)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            className={`${buttonColors(
+              point
+            )} text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition`}
           >
             {point}%
           </button>

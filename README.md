@@ -36,7 +36,6 @@
 
 ## 🧪 Things Left To Do
 
-- ❗ **Fix Snap to 10%**: Currently the bottom sheet goes beyond the screen (off view) when snapping to `10%`. Needs fix, a very weird bug.
 - 🧠 **Add Drag/Swipe Gesture**: Currently only snapping via button click. Next: Add touch/mouse drag interaction.
 - 🧼 **Refactor into components**:
   - `ProfileHeader.jsx`
