@@ -1,11 +1,13 @@
 import React, { useRef, useState } from "react";
 import { useEffect } from "react";
+import { useDarkMode } from "../context/DarkMode";
 
 const SpringSheet = () => {
   const containerRef = useRef(null);
   const [currentArea, setCurrentArea] = useState(0);
   const [activeTab, setActiveTab] = useState("about");
   const [viewHeight, setViewHeight] = useState(0);
+  const { isDark } = useDarkMode();
 
   const snapAreas = [90, 50, 10];
 
@@ -48,9 +50,7 @@ const SpringSheet = () => {
 
     newVert = Math.max(0, Math.min(newVert, viewHeight));
 
-    containerRef.current.style.transform = `translateY(${
-      newVert - top.current
-    }px)`;
+    containerRef.current.style.transform = `translateY(${newVert}px)`;
   };
 
   const getClosestSnapPointAfterDrag = (currentVert) => {
@@ -91,15 +91,23 @@ const SpringSheet = () => {
 
   return (
     <div>
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[60] flex gap-3 bg-black/80 backdrop-blur-sm px-4 py-2 rounded-full">
+      <div
+        className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[60] flex gap-3 px-4 py-2 rounded-full backdrop-blur-sm shadow ${
+          isDark ? "bg-white/40" : "bg-black/55"
+        }`}
+      >
         {snapAreas.map((point, i) => (
           <button
             key={i}
             onClick={() => getSnappedToSnapArea(i)}
             className={`px-3 py-1.5 rounded-full transition text-sm font-medium ${
               currentArea === i
-                ? "bg-white text-black"
-                : "bg-white/20 text-white hover:bg-white/30"
+                ? isDark
+                  ? "bg-white text-black"
+                  : "bg-black text-white"
+                : isDark
+                ? "bg-white/20 text-white hover:bg-white/30"
+                : "bg-black/10 text-black hover:bg-black/20"
             }`}
           >
             {point}%
@@ -109,7 +117,9 @@ const SpringSheet = () => {
 
       <div
         ref={containerRef}
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white shadow-2xl rounded-t-3xl transition-transform duration-300 ease-out"
+        className={`fixed bottom-0 left-0 right-0 z-50 shadow-2xl rounded-t-3xl transition-transform duration-300 ease-out ${
+          isDark ? "bg-gray-900 text-gray-200" : "bg-gray-50 text-gray-900"
+        }`}
         style={{
           height: "90vh",
           transform: `translateY(${getVertical(currentArea)}px)`,
@@ -118,7 +128,9 @@ const SpringSheet = () => {
         }}
       >
         <div
-          className="w-full flex items-center justify-center py-4 bg-gray-200 rounded-t-3xl cursor-grab active:cursor-grabbing"
+          className={`w-full flex items-center justify-center py-4 ${
+            isDark ? "bg-gray-800" : "bg-gray-200"
+          } rounded-t-3xl cursor-grab active:cursor-grabbing`}
           onPointerDown={onDragStart}
         >
           <div className="h-1.5 w-16 bg-gray-500 rounded-full" />
@@ -135,7 +147,9 @@ const SpringSheet = () => {
               className="w-24 h-24 rounded-full shadow-lg mb-2 object-cover"
             />
             <h2 className="text-xl font-bold">Samaresh Das</h2>
-            <p className="text-gray-600">Software Engineer · Burdwan, India</p>
+            <p className={`${isDark ? "text-gray-400" : "text-gray-600"}`}>
+              Software Engineer · Burdwan, India
+            </p>
           </div>
 
           <div className="flex justify-center mb-4">
@@ -156,7 +170,11 @@ const SpringSheet = () => {
 
           <div>
             {activeTab === "about" && (
-              <div className="space-y-2 text-gray-700">
+              <div
+                className={`space-y-2 ${
+                  isDark ? "text-gray-200" : "text-gray-700"
+                }`}
+              >
                 <p>
                   Samaresh is a passionate software enginner with a knack for
                   problem-solving. Expertised in web development area and
@@ -167,7 +185,11 @@ const SpringSheet = () => {
             )}
 
             {activeTab === "hobbies" && (
-              <ul className="list-disc list-inside text-gray-700 space-y-1">
+              <ul
+                className={`list-disc list-inside ${
+                  isDark ? "text-gray-200" : "text-gray-700"
+                } space-y-1`}
+              >
                 <li>💻 Coding & Exploring Problems</li>
                 <li>🎮 Gaming</li>
                 <li>🎬 Watching Movies</li>
@@ -182,7 +204,7 @@ const SpringSheet = () => {
                     key={id}
                     src={`https://picsum.photos/id/${id}/200`}
                     alt="Fav"
-                    className="rounded-lg object-cover h-24 w-full"
+                    className="rounded-lg object-cover h-24 w-full md:h-32"
                   />
                 ))}
               </div>
