@@ -23,7 +23,7 @@ const SpringSheet = () => {
   const getSnappedToSnapArea = (index) => {
     if (!containerRef.current || viewHeight === 0) return;
     const y = getVertical(index);
-    containerRef.current.style.transform = `transform 0.3s ease-out`;
+    containerRef.current.style.transition = `transform 0.3s ease-out`;
     containerRef.current.style.transform = `translateY(${y}px)`;
     setCurrentArea(index);
   };
@@ -40,6 +40,36 @@ const SpringSheet = () => {
 
     window.addEventListener("pointermove", onDragMove);
     window.addEventListener("pointerup", onDragEnd);
+  };
+
+  const onDragMove = (e) => {
+    const vert = e.clientY - startingPositon.current;
+    let newVert = top.current + vert;
+
+    newVert = Math.max(0, Math.min(newVert, viewHeight));
+
+    containerRef.current.style.transform = `translateY(${
+      newVert - top.current
+    }px)`;
+  };
+
+  const getClosestSnapPointAfterDrag = (currentVert) => {
+    const difference = snapAreas.map((_, i) =>
+      Math.abs(currentVert - getVertical(i))
+    );
+
+    return difference.indexOf(Math.min(...difference));
+  };
+
+  const onDragEnd = () => {
+    const rect = containerRef.current.getBoundingClientRect();
+    const topPixels = rect.top;
+    const getClosestSnapPoint = getClosestSnapPointAfterDrag(topPixels);
+
+    getSnappedToSnapArea(getClosestSnapPoint);
+
+    window.removeEventListener("pointermove", onDragMove);
+    window.removeEventListener("pointerup", onDragEnd);
   };
 
   useEffect(() => {
@@ -59,19 +89,9 @@ const SpringSheet = () => {
     }
   }, [viewHeight]);
 
-  const buttonColors = (point) => {
-    if (point === 90) {
-      return "bg-lime-500 hover:bg-lime-600";
-    } else if (point === 50) {
-      return "bg-yellow-500 hover:bg-yellow-600";
-    } else {
-      return "bg-red-500 hover:bg-red-700";
-    }
-  };
-
   return (
     <div>
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[60] flex gap-3 bg-black/80 backdrop-blur-sm px-4 py-2 rounded-full">
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[60] flex gap-3 bg-black/80 backdrop-blur-sm px-4 py-2 rounded-full">
         {snapAreas.map((point, i) => (
           <button
             key={i}
@@ -104,7 +124,10 @@ const SpringSheet = () => {
           <div className="h-1.5 w-16 bg-gray-500 rounded-full" />
         </div>
 
-        <div className="p-6 overflow-y-auto h-[calc(90vh-100px)]">
+        <div
+          className="p-6 overflow-y-auto"
+          style={{ height: "calc(90vh - 80px)" }}
+        >
           <div className="flex flex-col items-center mb-6">
             <img
               src="https://scontent.fccu10-1.fna.fbcdn.net/v/t39.30808-6/513045973_4066811733564775_3446498194797642414_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=7afjbbbEb64Q7kNvwGTe318&_nc_oc=Adku0wDrnxxLzLfIcEs36_dG9ddtkUe9e2gbjrWcOY79dbd3-Wm3cEeGfbUu9Yg0an4&_nc_zt=23&_nc_ht=scontent.fccu10-1.fna&_nc_gid=1BXAnQofsoGSnz6T93_BTA&oh=00_AfSM1nWabZ4a2pJDyzOYgSUCowpQsRCN7aQq5pd4nbEVnw&oe=68787679"
