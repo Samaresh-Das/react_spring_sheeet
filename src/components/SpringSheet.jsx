@@ -1,6 +1,9 @@
 import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 import { useDarkMode } from "../context/DarkMode";
+import Buttons from "./Buttons";
+import ProfileCard from "./SheetContent/ProfileCard";
+import FullContent from "./SheetContent/FullContent";
 
 const SpringSheet = () => {
   const containerRef = useRef(null);
@@ -16,21 +19,23 @@ const SpringSheet = () => {
 
   const maxSheetHeight = 90;
 
+  //to calculate how much below the sheet move in pixels for a given snap point
   const getVertical = (index) => {
     const inView = (maxSheetHeight * snapAreas[index]) / 100;
     const hiddenArea = maxSheetHeight - inView;
     return (viewHeight * hiddenArea) / 100;
   };
 
+  //function to snap the sheet at ony given snap point with smooth transitions. This is the main one responsible for snapping
   const getSnappedToSnapArea = (index) => {
     if (!containerRef.current || viewHeight === 0) return;
     const y = getVertical(index);
-    containerRef.current.style.transition = `transform 0.3s ease-out`;
+    containerRef.current.style.transition = `transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)`; //to give a bounce effect
     containerRef.current.style.transform = `translateY(${y}px)`;
     setCurrentArea(index);
   };
 
-  //drag functionality
+  //for storing the initial vertical position on mouse or event click
   const onDragStart = (e) => {
     if (!containerRef.current) return;
     containerRef.current.style.transition = "none";
@@ -44,6 +49,7 @@ const SpringSheet = () => {
     window.addEventListener("pointerup", onDragEnd);
   };
 
+  //for tracking the movement of the drag
   const onDragMove = (e) => {
     const vert = e.clientY - startingPositon.current;
     let newVert = top.current + vert;
@@ -53,6 +59,7 @@ const SpringSheet = () => {
     containerRef.current.style.transform = `translateY(${newVert}px)`;
   };
 
+  //to find the closes snap point while the sheet being dragged, to place it in the predefined snap points
   const getClosestSnapPointAfterDrag = (currentVert) => {
     const difference = snapAreas.map((_, i) =>
       Math.abs(currentVert - getVertical(i))
@@ -61,6 +68,7 @@ const SpringSheet = () => {
     return difference.indexOf(Math.min(...difference));
   };
 
+  //After the drag ends, it places the sheet to nearest snap points and remove listeners to remove bugs. This was the main thing which I struggled with as I was not sure at first to remove the listeners
   const onDragEnd = () => {
     const rect = containerRef.current.getBoundingClientRect();
     const topPixels = rect.top;
@@ -91,29 +99,12 @@ const SpringSheet = () => {
 
   return (
     <div>
-      <div
-        className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[60] flex gap-3 px-4 py-2 rounded-full backdrop-blur-sm shadow ${
-          isDark ? "bg-white/40" : "bg-black/55"
-        }`}
-      >
-        {snapAreas.map((point, i) => (
-          <button
-            key={i}
-            onClick={() => getSnappedToSnapArea(i)}
-            className={`px-3 py-1.5 rounded-full transition text-sm font-medium ${
-              currentArea === i
-                ? isDark
-                  ? "bg-white text-black"
-                  : "bg-black text-white"
-                : isDark
-                ? "bg-white/20 text-white hover:bg-white/30"
-                : "bg-black/10 text-black hover:bg-black/20"
-            }`}
-          >
-            {point}%
-          </button>
-        ))}
-      </div>
+      <Buttons
+        snapAreas={snapAreas}
+        currentArea={currentArea}
+        isDark={isDark}
+        onSnap={getSnappedToSnapArea}
+      />
 
       <div
         ref={containerRef}
@@ -127,6 +118,7 @@ const SpringSheet = () => {
           overflow: "hidden",
         }}
       >
+        {/* Draggable upper section of the sheet */}
         <div
           className={`w-full flex items-center justify-center py-4 ${
             isDark ? "bg-gray-800" : "bg-gray-200"
@@ -135,82 +127,12 @@ const SpringSheet = () => {
         >
           <div className="h-1.5 w-16 bg-gray-500 rounded-full" />
         </div>
-
-        <div
-          className="p-6 overflow-y-auto"
-          style={{ height: "calc(90vh - 80px)" }}
-        >
-          <div className="flex flex-col items-center mb-6">
-            <img
-              src="https://scontent.fccu10-1.fna.fbcdn.net/v/t39.30808-6/513045973_4066811733564775_3446498194797642414_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=7afjbbbEb64Q7kNvwGTe318&_nc_oc=Adku0wDrnxxLzLfIcEs36_dG9ddtkUe9e2gbjrWcOY79dbd3-Wm3cEeGfbUu9Yg0an4&_nc_zt=23&_nc_ht=scontent.fccu10-1.fna&_nc_gid=1BXAnQofsoGSnz6T93_BTA&oh=00_AfSM1nWabZ4a2pJDyzOYgSUCowpQsRCN7aQq5pd4nbEVnw&oe=68787679"
-              alt="Profile"
-              className="w-24 h-24 rounded-full shadow-lg mb-2 object-cover"
-            />
-            <h2 className="text-xl font-bold">Samaresh Das</h2>
-            <p className={`${isDark ? "text-gray-400" : "text-gray-600"}`}>
-              Software Engineer · Burdwan, India
-            </p>
-          </div>
-
-          <div className="flex justify-center mb-4">
-            {["about", "hobbies", "favorites"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 mx-1 rounded-lg transition ${
-                  activeTab === tab
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          <div>
-            {activeTab === "about" && (
-              <div
-                className={`space-y-2 ${
-                  isDark ? "text-gray-200" : "text-gray-700"
-                }`}
-              >
-                <p>
-                  Samaresh is a passionate software enginner with a knack for
-                  problem-solving. Expertised in web development area and
-                  enthusiastic about learning new technologies.
-                </p>
-                <p>He enjoys coding, gaming, and exploring new things.</p>
-              </div>
-            )}
-
-            {activeTab === "hobbies" && (
-              <ul
-                className={`list-disc list-inside ${
-                  isDark ? "text-gray-200" : "text-gray-700"
-                } space-y-1`}
-              >
-                <li>💻 Coding & Exploring Problems</li>
-                <li>🎮 Gaming</li>
-                <li>🎬 Watching Movies</li>
-                <li>🏋️ Gym Freak</li>
-              </ul>
-            )}
-
-            {activeTab === "favorites" && (
-              <div className="grid grid-cols-3 gap-3">
-                {[1011, 1022, 1033, 1044, 1055, 1066].map((id) => (
-                  <img
-                    key={id}
-                    src={`https://picsum.photos/id/${id}/200`}
-                    alt="Fav"
-                    className="rounded-lg object-cover h-24 w-full md:h-32"
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Isolated html css contents to seperate components */}
+        <FullContent
+          isDark={isDark}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
       </div>
     </div>
   );
